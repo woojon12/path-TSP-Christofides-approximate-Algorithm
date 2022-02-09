@@ -2,12 +2,15 @@
 #include "Cost.h"
 #include <iostream>
 #include <vector>
+#include <set>
 using namespace std;
 
 class vertex {
   int number;
   bool visited;
-  
+
+  friend class graph;
+
   public:
   vertex() : visited(false) {}
   vertex(int number)
@@ -25,7 +28,7 @@ class edge {
 
   friend class graph;
 public:
-  //edge(){}
+  edge() : weight() {}
   edge(vertex departure, vertex destination, cost weight)
   : departure(departure), destination(destination), weight(weight)
   {}
@@ -95,5 +98,52 @@ class graph {
     }
 
     return -1; //혹시 없으면 -1 반환
+  }
+
+  public:
+  graph MST() { //Minimum Spanning Tree
+    graph tempGraph;
+    vertex current = tempGraph.Edges[0].departure; //탐색 시작점은 그냥 대충 정하기
+
+    edge minEdge;
+
+    do
+    {
+    for(edge e : this->Edges) {
+      if(current == e.departure) { //출발지점 찾음
+        if(minEdge.weight > e.weight) {
+          minEdge = e;
+        }
+      }
+      else if(current == e.destination) {
+        if(minEdge.weight > e.weight) {
+          minEdge = e;
+        }
+      }
+    }
+    
+    tempGraph.push(minEdge);
+    current.visited = true;
+
+    if(current == minEdge.departure) current = minEdge.departure;
+    else current = minEdge.destination;
+    } while(allVertexVisited());
+  }
+
+  bool allVertexVisited()
+  {
+    //set 사용법 정리 : https://blockdmask.tistory.com/79
+    set<vertex> V;
+
+    for (edge e : Edges) {
+      V.insert(e.departure);
+      V.insert(e.destination);
+    }
+    
+    for (vertex v : V) {
+      if(v.visited == false) return false;
+    }
+
+    return true;
   }
 };
