@@ -1,7 +1,8 @@
 #pragma once
 #include "Cost.h"
+#include <iostream>
 #include <vector>
-using std::vector;
+using namespace std;
 
 class vertex {
   int number;
@@ -55,27 +56,44 @@ class graph {
   graph(int capacity){Edges.reserve(capacity);}
 
   graph& push(edge element) {
-    if(alreadyExist(element)) return *this;
-    if(onlyCostDiff(element)) {
+    enum {onlyCostDiffrent = -1, noExist = 0, alreadyExist = 1};
+
+    switch(alreadyExistOronlyCostDiff(element)) {
+      case alreadyExist:
+      return *this;
+
+      case onlyCostDiffrent: {
       int i = findIndex(element);
       Edges[i].weight = element.weight;
+      }
+      return *this;
+      
+      case noExist:
+      Edges.push_back(element);
+      return *this;
+
+      default:
+      cout << "What happended" << endl;
       return *this;
     }
-
-    Edges.push_back(element);
-    return *this;
   }
 
   private:
-  bool alreadyExist(edge element) {
+  int alreadyExistOronlyCostDiff(edge element) {
     for(edge e : Edges)
-      if((e == element) == 1) return true;
-    return false;
+      if (e == element) return e == element;
+    
+    return 0;
   }
-  bool onlyCostDiff(edge element) {
-    for(edge e : Edges)
-      if((e == element) == -1) return true;
-    return false;
+
+  int findIndex(edge element) {
+    int index = 0;
+
+    for (edge e : Edges) {
+      if(e == element) return index;
+      ++index;
+    }
+
+    return -1; //혹시 없으면 -1 반환
   }
-  int findIndex(edge);
 };
